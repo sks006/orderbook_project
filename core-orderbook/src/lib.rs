@@ -22,7 +22,23 @@ impl OrderBook {
             OrderType::Buy => self.buy_orders.push(order.clone()),
             OrderType::Sell => self.sell_orders.push(order.clone()),
         }
+        self.sorting_orders();
+        if self.buy_orders.is_empty() || self.sell_orders.is_empty() {
+            return;
+        } else {
+            let highest_buy = self.buy_orders.first();
+            let lowest_sell = self.sell_orders.first();
+            if let (Some(high), Some(low)) = (highest_buy, lowest_sell) {
+                if high.price >= low.price {
+                    println!("Matching orders found:");
+                    println!("Buy Order: {:?}", high);
+                    println!("Sell Order: {:?}", low);
+                }
+            }
+        }
+
     }
+
     pub fn display_order(&self) {
         println!("--- Buy Orders ---");
         for order in &self.buy_orders {
@@ -32,5 +48,11 @@ impl OrderBook {
         for order in &self.sell_orders {
             println!("{:?}", order);
         }
+    }
+    pub fn sorting_orders(&mut self) {
+        self.buy_orders
+            .sort_by(|a, b| b.price.partial_cmp(&a.price).unwrap());
+        self.sell_orders
+            .sort_by(|a, b| a.price.partial_cmp(&b.price).unwrap());
     }
 }
