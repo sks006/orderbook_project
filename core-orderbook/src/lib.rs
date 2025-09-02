@@ -1,3 +1,4 @@
+/// TODO:STEP:1 Represents the type of an order.
 #[derive(Clone, Debug, PartialEq)]
 pub enum OrderType {
     Buy,
@@ -17,28 +18,41 @@ pub struct OrderBook {
 }
 
 impl OrderBook {
-    pub fn add_order(&mut self, order: &Order) {
+    /// TODO: STEP:2   Adds a new order to the order book.
+   pub fn add_order(&mut self, order: &Order) {
         match order.order_type {
             OrderType::Buy => self.buy_orders.push(order.clone()),
             OrderType::Sell => self.sell_orders.push(order.clone()),
         }
         self.sorting_orders();
-        if self.buy_orders.is_empty() || self.sell_orders.is_empty() {
-            return;
-        } else {
-            let highest_buy = self.buy_orders.first();
-            let lowest_sell = self.sell_orders.first();
-            if let (Some(high), Some(low)) = (highest_buy, lowest_sell) {
-                if high.price >= low.price {
-                    println!("Matching orders found:");
-                    println!("Buy Order: {:?}", high);
-                    println!("Sell Order: {:?}", low);
+
+        while let (Some(high), Some(low)) =
+            (self.buy_orders.get_mut(0), self.sell_orders.get_mut(0))
+        {
+            if high.price >= low.price {
+                let filled_quantity = std::cmp::min(high.quantity, low.quantity);
+
+                high.quantity -= filled_quantity;
+                low.quantity -= filled_quantity;
+
+                println!("Matching orders found!");
+                println!("Filled quantity: {}", filled_quantity);
+                println!("Remaining Buy Order: {:?}", high);
+                println!("Remaining Sell Order: {:?}", low);
+
+                if high.quantity == 0 {
+                    self.buy_orders.remove(0);
                 }
+
+                if low.quantity == 0 {
+                    self.sell_orders.remove(0);
+                }
+            } else {
+                break;
             }
         }
-
     }
-
+    
     pub fn display_order(&self) {
         println!("--- Buy Orders ---");
         for order in &self.buy_orders {
@@ -49,6 +63,8 @@ impl OrderBook {
             println!("{:?}", order);
         }
     }
+
+    /// TODO: STEP:3 Sorts the orders in the order book.
     pub fn sorting_orders(&mut self) {
         self.buy_orders
             .sort_by(|a, b| b.price.partial_cmp(&a.price).unwrap());
