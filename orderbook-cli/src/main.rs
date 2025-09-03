@@ -6,52 +6,49 @@ fn main() {
         sell_orders: Vec::new(),
     };
 
-    println!("Initial state of the order book:");
-    order_book.display_order();
+    println!("--- Test Case: Canceling an Order ---");
 
-    println!("\n--- Test Case: Partial Fill and Complete Fill ---");
-
-    // 1. Add a large buy order
-    let buy_order_large = Order {
+    // 1. Add a buy order and a sell order that do not match
+    let buy_order = Order {
         id: 1,
         order_type: OrderType::Buy,
         price: 10.0,
         quantity: 100,
     };
-    println!("\nAdding new order: {:?}", buy_order_large);
-    order_book.add_order(&buy_order_large);
-
-    // 2. Add a small sell order that partially fills the buy order
-    let sell_order_small = Order {
+    order_book.add_order(&buy_order);
+    let buy_order = Order {
         id: 2,
-        order_type: OrderType::Sell,
+        order_type: OrderType::Buy,
         price: 10.0,
-        quantity: 50,
+        quantity: 100,
     };
-    println!("\nAdding new order: {:?}", sell_order_small);
-    order_book.add_order(&sell_order_small);
-
-    // 3. Add another small sell order to fully fill the remaining quantity
-    let sell_order_fill = Order {
+    let sell_order = Order {
         id: 3,
         order_type: OrderType::Sell,
-        price: 10.0,
+        price: 11.0,
         quantity: 50,
     };
-    println!("\nAdding new order: {:?}", sell_order_fill);
-    order_book.add_order(&sell_order_fill);
-    
-    // 4. Add a non-matching order to show the loop breaks
-    let sell_order_break = Order {
-        id: 4,
+     order_book.add_order(&sell_order);
+    let sell_order = Order {
+        id: 3,
         order_type: OrderType::Sell,
         price: 11.0,
-        quantity: 20,
+        quantity: 50,
     };
-    println!("\nAdding new order: {:?}", sell_order_break);
-    order_book.add_order(&sell_order_break);
 
-    // 5. Display the final state of the order book
-    println!("\nFinal state of the order book:");
+    println!("\nInitial State: Adding buy and sell orders that do not match.");
+    order_book.add_order(&buy_order);
+    order_book.add_order(&sell_order);
+    
+   
+    order_book.display_order();
+
+    // 2. Cancel the buy order
+    let order_id_to_cancel = 2;
+    println!("\nCanceling order with ID: {}", order_id_to_cancel);
+    order_book.cancel_order(order_id_to_cancel, OrderType::Buy);
+
+    // 3. Display the final state of the order book
+    println!("\nFinal state after canceling the buy order:");
     order_book.display_order();
 }

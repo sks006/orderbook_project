@@ -26,6 +26,7 @@ impl OrderBook {
         }
         self.sorting_orders();
 
+        // TODO: loop through the orders and match them
         while let (Some(high), Some(low)) =
             (self.buy_orders.get_mut(0), self.sell_orders.get_mut(0))
         {
@@ -66,9 +67,21 @@ impl OrderBook {
 
     /// TODO: STEP:3 Sorts the orders in the order book.
     pub fn sorting_orders(&mut self) {
+
         self.buy_orders
             .sort_by(|a, b| b.price.partial_cmp(&a.price).unwrap());
         self.sell_orders
             .sort_by(|a, b| a.price.partial_cmp(&b.price).unwrap());
     }
+
+    // TODO: STEP:4 cancel order
+    pub fn cancel_order(&mut self , order_id:u32, order_type: OrderType){
+
+        match order_type {
+            OrderType::Buy => self.buy_orders.retain(|order| order.id != order_id),
+            OrderType::Sell => self.sell_orders.retain(|order| order.id != order_id),
+        }
+
+    }
+    
 }
