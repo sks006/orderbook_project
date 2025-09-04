@@ -19,7 +19,7 @@ pub struct OrderBook {
 
 impl OrderBook {
     /// TODO: STEP:2   Adds a new order to the order book.
-   pub fn add_order(&mut self, order: &Order) {
+    pub fn add_order(&mut self, order: &Order) {
         match order.order_type {
             OrderType::Buy => self.buy_orders.push(order.clone()),
             OrderType::Sell => self.sell_orders.push(order.clone()),
@@ -53,7 +53,7 @@ impl OrderBook {
             }
         }
     }
-    
+
     pub fn display_order(&self) {
         println!("--- Buy Orders ---");
         for order in &self.buy_orders {
@@ -67,7 +67,6 @@ impl OrderBook {
 
     /// TODO: STEP:3 Sorts the orders in the order book.
     pub fn sorting_orders(&mut self) {
-
         self.buy_orders
             .sort_by(|a, b| b.price.partial_cmp(&a.price).unwrap());
         self.sell_orders
@@ -75,13 +74,28 @@ impl OrderBook {
     }
 
     // TODO: STEP:4 cancel order
-    pub fn cancel_order(&mut self , order_id:u32, order_type: OrderType){
-
+    pub fn cancel_order(&mut self, order_id: u32, order_type: OrderType) {
         match order_type {
             OrderType::Buy => self.buy_orders.retain(|order| order.id != order_id),
             OrderType::Sell => self.sell_orders.retain(|order| order.id != order_id),
         }
-
     }
-    
+
+    pub fn get_best_bid_and_ask(&self) -> (Option<f64>, Option<f64>) {
+        // Find the best bid (highest buy price)
+        let best_bid = self
+            .buy_orders
+            .iter()
+            .max_by(|a, b| a.price.partial_cmp(&b.price).unwrap())
+            .map(|order| order.price);
+
+        // Find the best ask (lowest sell price)
+        let best_ask = self
+            .sell_orders
+            .iter()
+            .min_by(|a, b| a.price.partial_cmp(&b.price).unwrap())
+            .map(|order| order.price);
+
+        (best_bid, best_ask)
+    }
 }
